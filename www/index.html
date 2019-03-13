@@ -1,0 +1,20 @@
+<html>
+  <head>
+          <title>Book store</title>
+  </head>
+  <body>
+          <h1>Our first server!</h1>
+          <ul></ul>
+         <script>       
+                 fetch('v2/books').then(function(response) {
+                         return response.json();
+                 }).then(function(json) {
+                        for(let i = 0; i< json.length; i++) {
+                           let listItem = document.createElement("li");
+                           let { title, author, price } = json[i];
+                                listItem.innerHTML = `${title} - ${author} - ${price.value}`;
+                           document.querySelector("ul").append(listItem);
+                        }
+                 });
+</script>
+  </body>

@@ -1,0 +1,141 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a simple bookstore server with a book inventory, users and\
+    \ a shopping cart."
+  version: "1.0.0"
+  title: "Simple Bookstore"
+  contact:
+    email: "vittorio.zaccaria@polimi.it"
+  license:
+    name: "Apache-2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/v2"
+tags:
+- name: "book"
+  description: "Available book"
+- name: "cart"
+  description: "Access to the cart"
+- name: "user"
+  description: "Operations about user"
+schemes:
+- "http"
+paths:
+  /books:
+    get:
+      tags:
+      - "book"
+      summary: "Books available in the inventory"
+      description: "List of books available in the inventory"
+      operationId: "booksGET"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "offset"
+        in: "query"
+        description: "Pagination offset. Default is 0."
+        required: false
+        type: "integer"
+      - name: "limit"
+        in: "query"
+        description: "Maximum number of items per page. Default is 20 and cannot exceed\
+          \ 500."
+        required: false
+        type: "integer"
+      responses:
+        200:
+          description: "A collection of Books"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Book"
+        404:
+          description: "Unexpected error"
+      x-swagger-router-controller: "Book"
+  /books/{bookId}:
+    get:
+      tags:
+      - "book"
+      summary: "Find book by ID"
+      description: "Returns a book"
+      operationId: "getBookById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "bookId"
+        in: "path"
+        description: "ID of book to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Book not found"
+      x-swagger-router-controller: "Book"
+definitions:
+  Book:
+    type: "object"
+    required:
+    - "author"
+    - "price"
+    - "title"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      title:
+        type: "string"
+        example: "Il deserto dei tartari"
+      author:
+        type: "string"
+        example: "Dino Buzzati"
+      price:
+        $ref: "#/definitions/Amount"
+      status:
+        type: "string"
+        description: "book availability in the inventory"
+        enum:
+        - "available"
+        - "out of stock"
+    title: "Book"
+    description: "A book for sale in the store"
+    example:
+      author: "Dino Buzzati"
+      price:
+        currency: "eur"
+        value: 602745618307040.375
+      id: 0
+      title: "Il deserto dei tartari"
+      status: "available"
+  Amount:
+    type: "object"
+    required:
+    - "currency"
+    - "value"
+    properties:
+      value:
+        type: "number"
+        format: "double"
+        minimum: 0.01
+        maximum: 1000000000000000
+      currency:
+        $ref: "#/definitions/Currency"
+    description: "Price\n"
+    example:
+      currency: "eur"
+      value: 602745618307040.375
+  Currency:
+    type: "string"
+    pattern: "^[A-Z]{3,3}$"
+    description: "some description\n"
+    example: "eur"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

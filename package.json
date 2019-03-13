@@ -1,0 +1,21 @@
+{
+  "name": "simple-bookstore",
+  "version": "1.0.0",
+  "description": "This is a simple bookstore server with a book inventory, users and a shopping cart.",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "connect": "^3.2.0",
+    "js-yaml": "^3.3.0",
+    "serve-static": "1.13.2",
+    "swagger-tools": "0.10.1"
+  }
+}
