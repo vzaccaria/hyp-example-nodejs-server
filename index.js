@@ -4,13 +4,15 @@ var fs = require("fs"),
   path = require("path"),
   http = require("http");
 
-let { setupDataLayer } = require("./service/DataLayer");
-
 var app = require("connect")();
 var swaggerTools = require("swagger-tools");
 var jsyaml = require("js-yaml");
 var serverPort = process.env.PORT || 8080;
+let cookieSession = require("cookie-session");
+let cookieParser = require("cookie-parser");
 let serveStatic = require("serve-static");
+
+let { setupDataLayer } = require("./service/DataLayer");
 
 // swaggerRouter configuration
 var options = {
@@ -23,7 +25,9 @@ var options = {
 var spec = fs.readFileSync(path.join(__dirname, "api/swagger.yaml"), "utf8");
 var swaggerDoc = jsyaml.safeLoad(spec);
 
-app.use(serveStatic(__dirname + "/www"));
+// Add cookies to responses
+app.use(cookieParser());
+app.use(cookieSession({ name: "session", keys: ["abc", "def"] }));
 
 // Initialize the Swagger middleware
 swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
@@ -33,13 +37,16 @@ swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
   // Validate Swagger requests
   app.use(middleware.swaggerValidator());
 
+  // Route validated requests to appropriate controller
   app.use(middleware.swaggerRouter(options));
 
   // Serve the Swagger documents and Swagger UI
   app.use(middleware.swaggerUi());
 
-  // Start the server
+  app.use(serveStatic(__dirname + "/www"));
+
   setupDataLayer().then(() => {
+    // Start the server
     http.createServer(app).listen(serverPort, function() {
       console.log(
         "Your server is listening on port %d (http://localhost:%d)",

@@ -10,7 +10,7 @@ info:
   license:
     name: "Apache-2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "polimi-hyp-vz-demo.herokuapp.com"
+host: "localhost:8080"
 basePath: "/v2"
 tags:
 - name: "book"
@@ -20,7 +20,7 @@ tags:
 - name: "user"
   description: "Operations about user"
 schemes:
-- "https"
+- "http"
 paths:
   /books:
     get:
@@ -79,7 +79,124 @@ paths:
         404:
           description: "Book not found"
       x-swagger-router-controller: "Book"
+  /user/login:
+    post:
+      tags:
+      - "user"
+      summary: "Login"
+      description: "Login with a form"
+      operationId: "userLoginPOST"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "formData"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "formData"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "succesfull login"
+        404:
+          description: "unauthorized"
+      x-swagger-router-controller: "User"
+  /user/register:
+    post:
+      tags:
+      - "user"
+      summary: "Register"
+      description: "Register into the store"
+      operationId: "userRegisterPOST"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "succesfull registration"
+        404:
+          description: "unauthorized"
+      x-swagger-router-controller: "User"
+  /cart/{cartId}:
+    get:
+      tags:
+      - "cart"
+      summary: "View the content of the cart"
+      operationId: "cartCartIdGET"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "cartId"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "succesful operartion"
+          schema:
+            $ref: "#/definitions/Cart"
+        404:
+          description: "unauthorized"
+      x-swagger-router-controller: "Cart"
 definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      address:
+        type: "string"
+      creditcard:
+        type: "string"
+    title: "User"
+    description: "A user"
+    example:
+      id: 1
+      name: "Vittorio"
+      address: "DEIB"
+      creditcard: "xyzabc"
+  Cart:
+    type: "object"
+    properties:
+      total:
+        $ref: "#/definitions/Amount"
+      books:
+        type: "array"
+        items:
+          $ref: "#/definitions/Book"
+    title: "Cart"
+    description: "Order for books"
+    example:
+      total:
+        currency: "eur"
+        value: 80082819046101.171875
+      books:
+      - id: 0
+        title: "Il deserto dei tartari"
+        author: "Dino Buzzati"
+        price:
+          value: 10
+          currency: "eur"
+      - id: 0
+        title: "Il deserto dei tartari"
+        author: "Dino Buzzati"
+        price:
+          value: 10
+          currency: "eur"
   Book:
     type: "object"
     required:
@@ -92,10 +209,8 @@ definitions:
         format: "int64"
       title:
         type: "string"
-        example: "Il deserto dei tartari"
       author:
         type: "string"
-        example: "Dino Buzzati"
       price:
         $ref: "#/definitions/Amount"
       status:
@@ -107,12 +222,12 @@ definitions:
     title: "Book"
     description: "A book for sale in the store"
     example:
-      author: "Dino Buzzati"
-      price:
-        currency: "eur"
-        value: 602745618307040.375
       id: 0
       title: "Il deserto dei tartari"
+      author: "Dino Buzzati"
+      price:
+        value: 10
+        currency: "eur"
       status: "available"
   Amount:
     type: "object"
@@ -130,7 +245,7 @@ definitions:
     description: "Price\n"
     example:
       currency: "eur"
-      value: 602745618307040.375
+      value: 11
   Currency:
     type: "string"
     pattern: "^[A-Z]{3,3}$"
