@@ -4,6 +4,8 @@ var fs = require("fs"),
   path = require("path"),
   http = require("http");
 
+let { setupDataLayer } = require("./service/DataLayer");
+
 var app = require("connect")();
 var swaggerTools = require("swagger-tools");
 var jsyaml = require("js-yaml");
@@ -37,15 +39,17 @@ swaggerTools.initializeMiddleware(swaggerDoc, function(middleware) {
   app.use(middleware.swaggerUi());
 
   // Start the server
-  http.createServer(app).listen(serverPort, function() {
-    console.log(
-      "Your server is listening on port %d (http://localhost:%d)",
-      serverPort,
-      serverPort
-    );
-    console.log(
-      "Swagger-ui is available on http://localhost:%d/docs",
-      serverPort
-    );
+  setupDataLayer().then(() => {
+    http.createServer(app).listen(serverPort, function() {
+      console.log(
+        "Your server is listening on port %d (http://localhost:%d)",
+        serverPort,
+        serverPort
+      );
+      console.log(
+        "Swagger-ui is available on http://localhost:%d/docs",
+        serverPort
+      );
+    });
   });
 });
